@@ -2,7 +2,7 @@ import pygame
 
 class Bomb():
     def __init__(self):
-        self.timer = 1000
+        self.timer = 10
 
     def taruh(self,x,y):
         self.x=x
@@ -17,33 +17,41 @@ class Bomb():
     def countdown(self):
         self.timer = self.timer - 1
 
+    def getTimer(self):
+        return self.timer
+
     def explode(self,peta):
-        if (peta[self.x][self.y]!='1' and self.x<11):
-            peta[self.x][self.y]='0'
-        if (peta[self.x+1][self.y] != '1' and self.x+1<11):
-            peta[self.x+1][self.y] = '0'
-        if (peta[self.x + 2][self.y] != '1' and self.x+2<11):
-            peta[self.x + 2][self.y] = '0'
-        if (peta[self.x + 3][self.y] != '1' and self.x+3<11):
-            peta[self.x + 3][self.y] = '0'
-        if (peta[self.x - 1][self.y] != '1' and self.x-1>=0):
-            peta[self.x - 1][self.y] = '0'
-        if (peta[self.x - 2][self.y] != '1' and self.x-2>=0):
-            peta[self.x - 2][self.y] = '0'
-        if (peta[self.x - 3][self.y] != '1' and self.x-3>=0):
-            peta[self.x - 3][self.y] = '0'
-        if (peta[self.x][self.y + 1] != '1' and self.y+1<16):
-            peta[self.x][self.y + 1] = '0'
-        if (peta[self.x][self.y + 2] != '1' and self.y+2<16):
-            peta[self.x][self.y + 2] = '0'
-        if (peta[self.x][self.y + 3] != '1' and self.y+3<16):
-            peta[self.x][self.y + 3] = '0'
-        if (peta[self.x][self.y - 1] != '1' and self.y-1>=0):
-            peta[self.x][self.y - 1] = '0'
-        if (peta[self.x][self.y - 2] != '1' and self.y-2>=0):
-            peta[self.x][self.y - 2] = '0'
-        if (peta[self.x][self.y - 3] != '1' and self.y-3>=0):
-            peta[self.x][self.y - 3] = '0'
+        for i in range(3):
+            if self.x + i >= 11:
+                break
+            if peta[self.x + i][self.y] == '1':
+                break
+
+            peta[self.x + i][self.y] = '0'
+
+        for i in range(3):
+            if self.x - i < 0:
+                break
+            if peta[self.x - i][self.y] == '1':
+                break
+
+            peta[self.x - i][self.y] = '0'
+
+        for i in range(3):
+            if self.y + i >= 16:
+                break
+            if peta[self.x][self.y+i] == '1':
+                break
+
+            peta[self.x][self.y+i] = '0'
+
+        for i in range(3):
+            if self.y - i <0:
+                break
+            if peta[self.x][self.y-i] == '1':
+                break
+
+            peta[self.x][self.y-i] = '0'
 
         return peta
 
@@ -77,7 +85,7 @@ class BomberMan():
         self.x = 0
         self.y = 0
 
-        self.list_bomb=[]
+        self.list_bomb = []
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("BomberMan")
 
@@ -91,10 +99,22 @@ class BomberMan():
         self.wall = pygame.transform.scale(pygame.image.load("./assets/wall.png"), (50, 50))
         self.box = pygame.transform.scale(pygame.image.load("./assets/box.png"), (50, 50))
         self.p1 = pygame.transform.scale(pygame.image.load("./assets/player1.png"), (50, 50))
+        self.bomb = pygame.transform.scale(pygame.image.load("./assets/bomb.png"), (50, 50))
+
+    def checkBomb(self):
+        for b in self.list_bomb:
+            if (b.getTimer()>0):
+                b.countdown()
+            else:
+                self.peta_game=b.explode(self.peta_game)
+                self.list_bomb.remove(b)
 
     def update(self):
         self.clock.tick(15)
         self.screen.fill(0)
+        self.checkBomb()
+        print(self.x)
+        print(self.y)
         self.up=pygame.key.get_pressed()[pygame.K_w]
         self.down = pygame.key.get_pressed()[pygame.K_s]
         self.left = pygame.key.get_pressed()[pygame.K_a]
@@ -105,18 +125,19 @@ class BomberMan():
             self.peta_game[self.x][self.y]='!'
             bomb=Bomb()
             bomb.taruh(self.x,self.y)
+            self.list_bomb.append(bomb)
 
         if (self.up):
-            if (self.peta_game[self.x-1][self.y]=='0' and self.x-1>=0):
+            if (self.x-1>=0 and self.peta_game[self.x-1][self.y]=='0' ):
                 self.x=self.x-1
         if (self.down):
-            if (self.peta_game[self.x+1][self.y]=='0' and self.x+1<16):
+            if (self.x+1<11 and self.peta_game[self.x+1][self.y]=='0' ):
                 self.x = self.x + 1
         if (self.left):
-            if (self.peta_game[self.x][self.y-1]=='0' and self.y-1>=0):
+            if (self.y-1>=0 and self.peta_game[self.x][self.y-1]=='0' ):
                 self.y = self.y - 1
         if (self.right):
-            if (self.peta_game[self.x][self.y+1]=='0' and self.y+1<11):
+            if (self.y+1<16 and self.peta_game[self.x][self.y+1]=='0' ):
                 self.y = self.y + 1
 
         for i in range(len(self.peta_game)):
@@ -129,6 +150,8 @@ class BomberMan():
                     self.screen.blit(self.wall,[j*50,i*50])
                 elif self.peta_game[i][j] == '2':
                     self.screen.blit(self.box,[j*50,i*50])
+                elif self.peta_game[i][j] == '!':
+                    self.screen.blit(self.bomb,[j*50,i*50])
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
