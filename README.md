@@ -29,9 +29,9 @@ Source Sprite
 
 Kontributor
 -------------
-1. 5114100020 - Fathoni Adi Kurniawan
-2. 5114100029 - Theo Pratama
-3. 5114100130 - Rahmatin Nadia
-4. 5114100170 - Anindita Larasati
+1. 5114100020 -- Fathoni Adi Kurniawan
+2. 5114100029 -- Theo Pratama
+3. 5114100130 -- Rahmatin Nadia
+4. 5114100170 -- Anindita Larasati
 
 	Pemrograman Jaringan D
