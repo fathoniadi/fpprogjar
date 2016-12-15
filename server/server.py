@@ -1,33 +1,69 @@
-import PodSixNet.Channel
-import PodSixNet.Server
-from time import sleep    
-class ClientChannel(PodSixNet.Channel.Channel):
-	def Network(self, data):
-		print data
-	def Network_myaction(self, data):
-		print("myaction:", data)
+import sys
+from time import sleep, localtime
+from weakref import WeakKeyDictionary
 
-class BoxesServer(PodSixNet.Server.Server):
-	channelClass = ClientChannel
+from PodSixNet.Server import Server
+from PodSixNet.Channel import Channel
+
+class ClientChannel(Channel):
+	"""
+	This is the server representation of a single connected client.
+	"""
 	def __init__(self, *args, **kwargs):
-		PodSixNet.Server.Server.__init__(self, *args, **kwargs)
+		self.nickname = "anonymous"
+		Channel.__init__(self, *args, **kwargs)
+	
+	def Close(self):
+		self._server.DelPlayer(self)
+	
+	##################################
+	### Network specific callbacks ###
+	##################################
+	
+	def Network_message(self, data):
+		self._server.SendToAll({"action": "message", "message": data['message'], "who": self.nickname})
+	
+	def Network_nickname(self, data):
+		self.nickname = data['nickname']
+		self._server.SendPlayers()
+
+class ChatServer(Server):
+	channelClass = ClientChannel
+	
+	def __init__(self, *args, **kwargs):
+		Server.__init__(self, *args, **kwargs)
+		self.players = WeakKeyDictionary()
+		print 'Server launched'
+	
 	def Connected(self, channel, addr):
-		print 'new connection: channel = ', channel
-
-	def Game(self):
-		counter = 0
+		self.AddPlayer(channel)
+	
+	def AddPlayer(self, player):
+		print "New Player" + str(player.addr)
+		self.players[player] = True
+		self.SendPlayers()
+		print "players", [p for p in self.players]
+	
+	def DelPlayer(self, player):
+		print "Deleting Player" + str(player.addr)
+		del self.players[player]
+		self.SendPlayers()
+	
+	def SendPlayers(self):
+		self.SendToAll({"action": "players", "players": [p.nickname for p in self.players]})
+	
+	def SendToAll(self, data):
+		[p.Send(data) for p in self.players]
+	
+	def Launch(self):
 		while True:
-			counter+=1
-			print counter
-			sleep(1)
+			self.Pump()
+			sleep(0.0001)
 
+# get command line argument of server, port
 host = "127.0.0.1"
-port = 8000
+port = "8000"
 
-print "Starting server on "+host+" "+str(port)
+s = ChatServer(localaddr=(host, int(port)))
+s.Launch()
 
-boxesServe = BoxesServer(localaddr=(host, port))
-print("boxesServe=",str(boxesServe))
-while True:
-	boxesServe.Game()
-	sleep(0.01)
