@@ -1,0 +1,42 @@
+from socket import socket, AF_INET, SOCK_STREAM
+from bs4 import BeautifulSoup
+
+
+host = "10.151.62.72"
+port = 80
+CRLF = "\r\n"
+RECV_BUFFER = 1024
+data = ""
+
+s = socket(AF_INET, SOCK_STREAM)
+s.connect((host,port))
+request = "GET /dataset/tes.pptx HTTP/1.1 %s" %  CRLF
+request += "HOST: %s %s" % (host, CRLF)
+request += CRLF
+s.send(request)
+
+
+
+while 1:
+	tmp = s.recv(RECV_BUFFER)
+		if '\r\n\r\n' in data:
+				header = data.split('\r\n\r\n')[0]
+						length = header.split('\r\n')[3].split(' ')[1]
+								content = data.split('\r\n\r\n')[1]
+										if len(content) == int(length):
+													break
+														data+=tmp
+														
+														
+														if ("application/octet-stream" in header):
+															print header
+																filename = header.split('\r\n')[1].split('"')[1]
+																	f=open(filename,'wb')
+																		f.write(content)
+																			f.close()
+																				
+																				else:
+																					soup=BeautifulSoup(data,'html.parser')	
+																						print soup.prettify()
+																						
+																						s.close()

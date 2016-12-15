@@ -20,16 +20,17 @@ class Client(ConnectionListener):
 		# launch our threaded input loop
 		t = start_new_thread(self.InputLoop, ())
 	
-	def Loop(self):
-		connection.Pump()
-		self.Pump()
+		
 	
-	def InputLoop(self):
+	def inputLoop(self):
 		# horrid threaded input loop
 		# continually reads from stdin and sends whatever is typed to the server
+		connection.Pump()
+		self.Pump()
 		counter = 0
 		while 1:
 			counter +=1
+			print counter
 			connection.Send({"action": "message", "message": counter})
 	
 	#######################################
@@ -59,5 +60,5 @@ host = "127.0.0.1"
 port = "8000"
 c = Client(host, int(port))
 while 1:
-	c.Loop()
+	c.inputLoop()
 	sleep(0.001)

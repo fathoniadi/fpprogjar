@@ -28,7 +28,7 @@ class ClientChannel(Channel):
 		self._server.SendPlayers()
 
 class ChatServer(Server):
-	channelClass = ClientChannel
+	#channelClass = ClientChannel
 	
 	def __init__(self, *args, **kwargs):
 		Server.__init__(self, *args, **kwargs)
@@ -37,7 +37,11 @@ class ChatServer(Server):
 	
 	def Connected(self, channel, addr):
 		self.AddPlayer(channel)
-	
+
+	def ReadMessage(self, data):
+		print data['message']
+
+
 	def AddPlayer(self, player):
 		print "New Player" + str(player.addr)
 		self.players[player] = True
