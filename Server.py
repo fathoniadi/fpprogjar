@@ -3,6 +3,7 @@ import threading
 import sys
 import select
 
+list_player = []
 
 class BombermanServer:
     def __init__(self):
@@ -31,6 +32,20 @@ class BombermanServer:
                 if s == self.server:
                     sock,addr=self.server.accept()
                     print ("New client connect : ",sock)
+                    list_player.append(sock)
+                    curPlayer=len(list_player)
+                    sock.send(str("Player=" + "player" + str(len(list_player))+"\n").encode('utf-8'))
+                    if (curPlayer==1):
+                        sock.send(str("InitPos=" + str("0 0\n")).encode('utf-8'))
+                    elif (curPlayer == 2):
+                        sock.send(str("InitPos=" + str("10 0\n")).encode('utf-8'))
+                    elif (curPlayer == 3):
+                        sock.send(str("InitPos=" + str("0 15\n")).encode('utf-8'))
+                    elif (curPlayer == 4):
+                        sock.send(str("InitPos=" + str("10 15\n")).encode('utf-8'))
+
+                    sock.send(str("EOF INIT\n").encode('utf-8'))
+
                     c = Client(sock,addr)
                     c.start()
 
@@ -53,6 +68,7 @@ class Client(threading.Thread):
             data = self.client.recv(1024)
             if (not data):
                 self.client.close()
+                list_player.remove(self.client)
                 running = 0
             else:
                 print(data.decode())
