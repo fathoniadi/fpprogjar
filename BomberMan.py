@@ -3,6 +3,25 @@ import Bomb
 import GameMap
 import Player
 import State
+import socket
+import threading
+import select
+
+class Client(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.host = 'localhost'
+        self.port = 5000
+        self.threads = []
+        self.open_socket()
+
+    def send(self,posx,posy):
+        data=str(posx)+" "+str(posy)
+        self.client.send(data.encode('utf-8'))
+
+    def open_socket(self):
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect((self.host,self.port))
 
 class BomberMan():
     BLACK = (0, 0, 0)
@@ -26,7 +45,10 @@ class BomberMan():
         self.initSprite()
         self.STATE=State.State.RUNNING
         self.gm=GameMap.GameMap()
+
         self.peta_game = self.gm.createMap("./assets/peta/map.txt")
+        self.client=Client()
+        self.client.start()
 
     def initSprite(self):
         self.grass = pygame.transform.scale(pygame.image.load("./assets/grass.png"),(50,50))
@@ -52,6 +74,8 @@ class BomberMan():
         while(self.STATE==State.State.RUNNING):
             self.clock.tick(15)
             self.screen.fill(0)
+            self.client.send(self.player.x,self.player.y)
+
             self.up=pygame.key.get_pressed()[pygame.K_w]
             self.down = pygame.key.get_pressed()[pygame.K_s]
             self.left = pygame.key.get_pressed()[pygame.K_a]
