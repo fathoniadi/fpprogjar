@@ -55,6 +55,7 @@ class BomberMan():
         self.player=Player.Player(0,0)
         self.player.x = 0
         self.player.y = 0
+        self.STATE=State.State.RUNNING
         self.list_bomb = []
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("BomberMan")
@@ -78,6 +79,9 @@ class BomberMan():
     def startGame(self):
         data=self.packageclient.startGame(self.room)
         self.client.send(data)
+        response = self.client.receiveOnce()
+        response = self.packageclient.deSerialization(response)
+        self.player.initPlayer(response)
 
     def initRoom(self,room):
         data=self.packageclient.createGame(room)
@@ -105,7 +109,6 @@ class BomberMan():
         exit()
 
     def update(self):
-        self.client.initGame()
         self.initSprite()
         self.gm = GameMap.GameMap()
         self.peta_game = self.gm.createMap("./assets/peta/map.txt")
@@ -114,7 +117,8 @@ class BomberMan():
         while(self.STATE==State.State.RUNNING):
             self.clock.tick(15)
             self.screen.fill(0)
-            self.client.send(self.player.x,self.player.y)
+            location=self.packageclient.location(self.player.x,self.player.y,self.player.file_player,self.room)
+            self.client.send(location)
 
             self.up=pygame.key.get_pressed()[pygame.K_w]
             self.down = pygame.key.get_pressed()[pygame.K_s]

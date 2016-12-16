@@ -35,6 +35,5 @@ while(1):
         print ("Starting game....")
         if (connected):
             bomberman.startGame()
-
-while 1:
-    bomberman.update()
+            while 1:
+                bomberman.update()

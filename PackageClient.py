@@ -18,6 +18,10 @@ class PackageClient():
         self.data = {'code':100,'room':_room}
         return self.data
 
+    def location(self,_x,_y,_player,_room):
+        self.data = {'code':200,'playerName':_player,'x':_x,'y':_y,'room':_room}
+        return self.data
+
     def deSerialization(self, data):
         return json.loads(data)
 

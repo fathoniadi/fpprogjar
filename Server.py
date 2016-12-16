@@ -68,10 +68,14 @@ class Client(threading.Thread):
             if (not data):
                 self.client.close()
                 running = 0
-            print (data)
+
+            for i in list_room:
+                print ("Room = ",i,"Data = ",list_room[i])
+
             if data['code']==1:
                 list_player=[]
                 list_room[data['room']]['listPlayer']=list_player
+                list_room[data['room']]['location']={'player1':{'x':-1,'y':-1,'alive':False },'player2':{'x':-1,'y':-1,'alive':False }}
                 self.send(packageserver.createPackageResponse("Created room " + str(data['room']),True))
                 print ("Room created : ",list_room)
 
@@ -102,18 +106,23 @@ class Client(threading.Thread):
                 player_name=""
                 x=-1
                 y=-1
-                if (pos==1):
+                if (pos==0):
                     player_name="player1"
                     x=0
                     y=0
-                elif (pos==2):
+                elif (pos==1):
                     player_name = "player2"
                     x = 10
                     y = 15
 
+                list_room[data['room']]['location'][str(player_name)]['alive']=True
                 data=packageserver.createPackageInitGame(data['room'],player_name,x,y)
                 print (data)
                 self.send(data)
+
+            elif data['code']==200:
+                list_room[data['room']]['location'][data['playerName']]['x']=data['x']
+                list_room[data['room']]['location'][data['playerName']]['y'] = data['y']
 
 server=BombermanServer()
 server.run()
