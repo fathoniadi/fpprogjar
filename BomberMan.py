@@ -6,6 +6,8 @@ import State
 import socket
 import threading
 import select
+import PackageServer
+import PackageClient
 
 class Client(threading.Thread):
     def __init__(self,game):
@@ -16,39 +18,28 @@ class Client(threading.Thread):
         self.open_socket()
         self.game=game
 
-    def send(self,posx,posy):
-        data=str(posx)+" "+str(posy)
+    def send(self,data):
+        print ("Sending....: ",data)
+        packetclient=PackageClient.PackageClient()
+        data=packetclient.serialization(data)
         self.client.send(data.encode('utf-8'))
 
     def open_socket(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect((self.host,self.port))
 
-    def initGame(self):
+    def receiveOnce(self):
+        msg=self.client.recv(1024)
+        return (msg.decode())
+
+    def run(self):
         input = [self.client]
         running = 1
         while running:
             inputready, outputready, exceptready = select.select(input, [], [])
             for s in inputready:
-                print ("Incoming message : ")
-                data=self.client.recv(1024)
-                data=data.decode()
-                data=data.split("\n")
-                print (data)
-                for i in range(len(data)):
-                    if "Player" in data[i]:
-                        cmd=data[i].split("=")
-                        self.game.setPlayer(cmd[1])
-                        print("debug ", cmd)
-                    elif "InitPos" in data[i]:
-                        cmd = data[i].split("=")
-                        cmd = cmd[1]
-                        cmd = cmd.split(" ")
-                        self.game.setPosition(cmd[0],cmd[1])
-                        print("debug ", cmd)
-                    elif "EOF INIT" in data[i]:
-                        running=0
-                        break
+                msg=self.client.recv(1024)
+                print (msg.decode())
 
 class BomberMan():
     BLACK = (0, 0, 0)
@@ -67,24 +58,16 @@ class BomberMan():
         self.list_bomb = []
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("BomberMan")
-
-        self.nama_player=""
         self.client = Client(self)
-        self.client.initGame()
-
-        print ("DEBUG",self.nama_player)
         self.clock = pygame.time.Clock()
-        self.initSprite()
-        self.STATE=State.State.RUNNING
-        self.gm=GameMap.GameMap()
+        self.packageclient=PackageClient.PackageClient()
 
-        self.peta_game = self.gm.createMap("./assets/peta/map.txt")
 
     def initSprite(self):
         self.grass = pygame.transform.scale(pygame.image.load("./assets/grass.png"),(50,50))
         self.wall = pygame.transform.scale(pygame.image.load("./assets/wall.png"), (50, 50))
         self.box = pygame.transform.scale(pygame.image.load("./assets/box.png"), (50, 50))
-        self.p1 = pygame.transform.scale(pygame.image.load("./assets/"+str(self.nama_player)+".png"), (50, 50))
+        self.p1 = pygame.transform.scale(pygame.image.load("./assets/"+str(self.player.file_player)+".png"), (50, 50))
         self.bomb = pygame.transform.scale(pygame.image.load("./assets/bomb.png"), (50, 50))
         self.explosion = pygame.transform.scale(pygame.image.load("./assets/explosion.png"), (50, 50))
         self.gameover = pygame.transform.scale(pygame.image.load("./assets/gameover.png"), (800, 600))
@@ -92,12 +75,26 @@ class BomberMan():
     def changeState(self,state):
         self.STATE=state
 
-    def setPlayer(self,str):
-        self.nama_player=str
+    def startGame(self):
+        data=self.packageclient.startGame(self.room)
+        self.client.send(data)
 
-    def setPosition(self,x,y):
-        self.player.x=int(x)
-        self.player.y=int(y)
+    def initRoom(self,room):
+        data=self.packageclient.createGame(room)
+        self.client.send(data)
+        response = self.client.receiveOnce()
+
+        return (response)
+
+    def connectRoom(self,room):
+        data = self.packageclient.connectToRoom(room)
+        self.client.send(data)
+        response=self.client.receiveOnce()
+        status = self.packageclient.deSerialization(response)
+        if status['success']:
+            self.room = room
+
+        return (response)
 
     def gameOver(self):
         self.screen.blit(self.gameover, [0, 0])
@@ -108,6 +105,12 @@ class BomberMan():
         exit()
 
     def update(self):
+        self.client.initGame()
+        self.initSprite()
+        self.gm = GameMap.GameMap()
+        self.peta_game = self.gm.createMap("./assets/peta/map.txt")
+        self.client.start()
+
         while(self.STATE==State.State.RUNNING):
             self.clock.tick(15)
             self.screen.fill(0)
