@@ -19,7 +19,7 @@ class Client(threading.Thread):
         self.game=game
 
     def send(self,data):
-        print ("Sending....: ",data)
+        #print ("Sending....: ",data)
         packetclient=PackageClient.PackageClient()
         data=packetclient.serialization(data)
         self.client.send(data.encode('utf-8'))
@@ -39,7 +39,10 @@ class Client(threading.Thread):
             inputready, outputready, exceptready = select.select(input, [], [])
             for s in inputready:
                 msg=self.client.recv(1024)
-                print (msg.decode())
+                msg=msg.decode()
+                packetclient = PackageClient.PackageClient()
+                data=packetclient.deSerialization(msg)
+                self.game.broadcastReceive(data)
 
 class BomberMan():
     BLACK = (0, 0, 0)
@@ -55,6 +58,10 @@ class BomberMan():
         self.player=Player.Player(0,0)
         self.player.x = 0
         self.player.y = 0
+        self.player2 = Player.Player(0, 0)
+        self.player2.x = 0
+        self.player2.y = 0
+
         self.STATE=State.State.RUNNING
         self.list_bomb = []
         self.screen = pygame.display.set_mode((width, height))
@@ -68,7 +75,8 @@ class BomberMan():
         self.grass = pygame.transform.scale(pygame.image.load("./assets/grass.png"),(50,50))
         self.wall = pygame.transform.scale(pygame.image.load("./assets/wall.png"), (50, 50))
         self.box = pygame.transform.scale(pygame.image.load("./assets/box.png"), (50, 50))
-        self.p1 = pygame.transform.scale(pygame.image.load("./assets/"+str(self.player.file_player)+".png"), (50, 50))
+        self.p1 = pygame.transform.scale(pygame.image.load("./assets/player1.png"), (50, 50))
+        self.p2 = pygame.transform.scale(pygame.image.load("./assets/player2.png"), (50, 50))
         self.bomb = pygame.transform.scale(pygame.image.load("./assets/bomb.png"), (50, 50))
         self.explosion = pygame.transform.scale(pygame.image.load("./assets/explosion.png"), (50, 50))
         self.gameover = pygame.transform.scale(pygame.image.load("./assets/gameover.png"), (800, 600))
@@ -82,6 +90,11 @@ class BomberMan():
         response = self.client.receiveOnce()
         response = self.packageclient.deSerialization(response)
         self.player.initPlayer(response)
+        if (self.player.file_player=="player1"):
+            self.player2.file_player="player2"
+        if (self.player.file_player == "player2"):
+            self.player2.file_player = "player1"
+
 
     def initRoom(self,room):
         data=self.packageclient.createGame(room)
@@ -107,6 +120,22 @@ class BomberMan():
             self.clock.tick(10)
 
         exit()
+
+    def broadcastReceive(self,data):
+        #print (data)
+        if (self.player.file_player=="player1"):
+            enemy_x=data['player2X']
+            enemy_y = data['player2Y']
+            self.player2.x=enemy_x
+            self.player2.y=enemy_y
+            self.player2.file_player="player2"
+
+        if (self.player.file_player=="player2"):
+            enemy_x=data['player1X']
+            enemy_y = data['player1Y']
+            self.player2.x=enemy_x
+            self.player2.y=enemy_y
+            self.player2.file_player = "player1"
 
     def update(self):
         self.initSprite()
@@ -146,8 +175,19 @@ class BomberMan():
 
             for i in range(len(self.peta_game)):
                 for j in range(len(self.peta_game[i])):
+
                     if i==self.player.x and j==self.player.y:
-                        self.screen.blit(self.p1, [j * 50, i * 50])
+                        if (self.player.file_player=="player1"):
+                            self.screen.blit(self.p1, [j * 50, i * 50])
+                        elif (self.player.file_player == "player2"):
+                            self.screen.blit(self.p2, [j * 50, i * 50])
+
+                    elif i == self.player2.x and j == self.player2.y:
+                        if (self.player2.file_player == "player1"):
+                            self.screen.blit(self.p1, [j * 50, i * 50])
+                        elif (self.player2.file_player == "player2"):
+                            self.screen.blit(self.p2, [j * 50, i * 50])
+
                     elif self.peta_game[i][j] == '0':
                         self.screen.blit(self.grass, [j*50, i*50])
                     elif self.peta_game[i][j] == '1':
