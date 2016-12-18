@@ -1,4 +1,4 @@
-import json
+import pickle
 import State
 
 class PackageClient():
@@ -22,8 +22,12 @@ class PackageClient():
         self.data = {'code':200,'playerName':_player,'x':_x,'y':_y,'room':_room}
         return self.data
 
+    def createPackagePlayerDead(self, _playerName):
+        self.data = {'code': 300, 'playerName': _playerName}
+        return self.data
+
     def deSerialization(self, data):
-        return json.loads(data)
+        return pickle.loads(data)
 
     def serialization(self, data):
-        return json.dumps(data)
+        return pickle.dumps(data)
