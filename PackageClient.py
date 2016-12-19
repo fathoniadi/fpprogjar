@@ -35,3 +35,7 @@ class PackageClient():
 
     def serialization(self, data):
         return json.dumps(data)
+
+    def SendNewLocBomb(self, _playerName, room):
+        self.data = {'code': 201, 'playerName': _playerName, 'room': _room}
+        return self.data
