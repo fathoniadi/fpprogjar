@@ -16,10 +16,10 @@ Penggunaan
 	- Pygame 
 
 ##### 1. Jalankan file server
-##### 1. Jalankan file server
-##### 1. Jalankan file server
-##### 1. Jalankan file server
-
+##### 2. Jalankan file Main.py
+##### 3. Salah satu player pilih menu create game
+##### 4. Kedua player pilih connect ke room yang telah dibuat
+##### 5. Pilih menu 3 untuk start game
 
 Source Sprite
 -------------
