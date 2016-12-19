@@ -61,8 +61,7 @@ class Client(threading.Thread):
         running = 1
         while running:
             #print ("Client  : ", self.client)
-            msg = self.client.recv()
-
+            msg = self.client.recv(1024)
             msg=msg.decode()
             packageserver=PackageServer.PackageServer()
             packageclient=PackageClient.PackageClient()
