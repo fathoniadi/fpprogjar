@@ -9,20 +9,6 @@ import select
 import PackageServer
 import PackageClient
 
-class SenderThread(threading.Thread):
-    def __init__(self, socket):
-        threading.Thread.__init__(self)
-        self.client=socket
-
-    def prepare(self,data):
-        self.data=data
-
-    def run(self):
-        packetclient = PackageClient.PackageClient()
-        data = packetclient.serialization(self.data)
-        self.client.sendall(data.encode('utf-8'))
-
-
 class Client(threading.Thread):
     def __init__(self,game):
         threading.Thread.__init__(self)
@@ -33,9 +19,9 @@ class Client(threading.Thread):
         self.game=game
 
     def sendall(self,data):
-        sender=SenderThread(self.client)
-        sender.prepare(data)
-        sender.start()
+        packetclient = PackageClient.PackageClient()
+        data = packetclient.serialization(data)
+        self.client.sendall(data.encode('utf-8'))
 
     def open_socket(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,9 +39,12 @@ class Client(threading.Thread):
             for s in inputready:
                 msg=self.client.recv(1024)
                 msg=msg.decode()
-                packetclient = PackageClient.PackageClient()
-                data=packetclient.deSerialization(msg)
-                self.game.broadcastReceive(data)
+                try:
+                    packetclient = PackageClient.PackageClient()
+                    data=packetclient.deSerialization(msg)
+                    self.game.broadcastReceive(data)
+                except :
+                    print("catch")
 
 class BomberMan():
     BLACK = (0, 0, 0)
