@@ -44,7 +44,7 @@ class Client(threading.Thread):
                     data=packetclient.deSerialization(msg)
                     self.game.broadcastReceive(data)
                 except :
-                    print("catch")
+                    pass
 
 class BomberMan():
     BLACK = (0, 0, 0)
@@ -164,6 +164,10 @@ class BomberMan():
             self.right = pygame.key.get_pressed()[pygame.K_d]
             self.space = pygame.key.get_pressed()[pygame.K_SPACE]
 
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+
             if (self.space):
                 self.peta_game[self.player.x][self.player.y]='!'
                 bombData=self.packageclient.createPackageBomb(self.player.x,self.player.y,self.room)
@@ -211,9 +215,6 @@ class BomberMan():
                     elif self.peta_game[i][j] == '@' :
                         self.screen.blit(self.explosion,[j*50,i*50])
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    exit()
 
             pygame.display.flip()
 

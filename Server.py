@@ -71,6 +71,9 @@ class Client(threading.Thread):
                 packageclient=PackageClient.PackageClient()
                 listMsg=msg.split('}')
                 for msg in listMsg:
+                    if (msg==""):
+                        continue
+                    print(msg)
                     msg=msg+"}"
                     print (msg)
                     try:
@@ -153,7 +156,7 @@ class Client(threading.Thread):
                             self.sendall(data)
 
                     except:
-                        print ("catch")
+                        pass
 
 server=BombermanServer()
 server.run()
