@@ -20,8 +20,9 @@ class Menu():
         self.menu = pygame.transform.scale(pygame.image.load("./assets/Background_baru.png"), (800, 600))
         self.screen.blit(self.menu,(0,0))
 
-    def update(self):
-        pygame.display.flip()
+    def update(self): 
+	while True:
+        	pygame.display.flip()
             
 menu=Menu()
 menu.update()

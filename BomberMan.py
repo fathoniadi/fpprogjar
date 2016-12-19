@@ -9,6 +9,20 @@ import select
 import PackageServer
 import PackageClient
 
+class SenderThread(threading.Thread):
+    def __init__(self, socket):
+        threading.Thread.__init__(self)
+        self.client=socket
+
+    def prepare(self,data):
+        self.data=data
+
+    def run(self):
+        packetclient = PackageClient.PackageClient()
+        data = packetclient.serialization(self.data)
+        self.client.sendall(data.encode('utf-8'))
+
+
 class Client(threading.Thread):
     def __init__(self,game):
         threading.Thread.__init__(self)
@@ -18,11 +32,10 @@ class Client(threading.Thread):
         self.open_socket()
         self.game=game
 
-    def send(self,data):
-        #print ("Sending....: ",data)
-        packetclient=PackageClient.PackageClient()
-        data=packetclient.serialization(data)
-        self.client.send(data.encode('utf-8'))
+    def sendall(self,data):
+        sender=SenderThread(self.client)
+        sender.prepare(data)
+        sender.start()
 
     def open_socket(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -86,7 +99,7 @@ class BomberMan():
 
     def startGame(self):
         data=self.packageclient.startGame(self.room)
-        self.client.send(data)
+        self.client.sendall(data)
         response = self.client.receiveOnce()
         response = self.packageclient.deSerialization(response)
         self.player.initPlayer(response)
@@ -98,14 +111,14 @@ class BomberMan():
 
     def initRoom(self,room):
         data=self.packageclient.createGame(room)
-        self.client.send(data)
+        self.client.sendall(data)
         response = self.client.receiveOnce()
 
         return (response)
 
     def connectRoom(self,room):
         data = self.packageclient.connectToRoom(room)
-        self.client.send(data)
+        self.client.sendall(data)
         response=self.client.receiveOnce()
         status = self.packageclient.deSerialization(response)
         if status['success']:
@@ -122,7 +135,7 @@ class BomberMan():
         exit()
 
     def broadcastReceive(self,data):
-        #print (data)
+        print (data)
         if (self.player.file_player=="player1"):
             enemy_x=data['player2X']
             enemy_y = data['player2Y']
@@ -147,7 +160,7 @@ class BomberMan():
             self.clock.tick(15)
             self.screen.fill(0)
             location=self.packageclient.location(self.player.x,self.player.y,self.player.file_player,self.room)
-            self.client.send(location)
+            self.client.sendall(location)
 
             self.up=pygame.key.get_pressed()[pygame.K_w]
             self.down = pygame.key.get_pressed()[pygame.K_s]

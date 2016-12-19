@@ -52,20 +52,24 @@ class Client(threading.Thread):
         self.size = 1024
         self.room = -1
 
-    def send(self,data):
+    def sendall(self,data):
         serverpackage=PackageServer.PackageServer()
         data=serverpackage.serialization(data)
-        self.client.send(data.encode('utf-8'))
+        self.client.sendall(data.encode('utf-8'))
 
     def run(self):
         running = 1
         while running:
             #print ("Client  : ", self.client)
             msg = self.client.recv(1024)
+
             msg=msg.decode()
             packageserver=PackageServer.PackageServer()
             packageclient=PackageClient.PackageClient()
+            print (msg)
             data=packageclient.deSerialization(msg)
+
+            data['room'] = str(data['room'])
             if (not data):
                 self.client.close()
                 running = 0
@@ -74,21 +78,21 @@ class Client(threading.Thread):
                 list_player=[]
                 list_room[data['room']]['listPlayer']=list_player
                 list_room[data['room']]['location']={'player1':{'x':-1,'y':-1,'alive':False },'player2':{'x':-1,'y':-1,'alive':False }}
-                self.send(packageserver.createPackageResponse("Created room " + str(data['room']),True))
-                #print ("Room created : ",list_room)
+                self.sendall(packageserver.createPackageResponse("Created room " + str(data['room']),True))
+                print ("Room created : ",list_room)
 
             elif data['code']==2:
                 if not list_room[data['room']]:
-                    self.send(packageserver.createPackageResponse("Not found room "+str(data['room']),False))
+                    self.sendall(packageserver.createPackageResponse("Not found room "+str(data['room']),False))
                     continue
 
                 if len(list_room[data['room']])>2:
-                    self.send(packageserver.createPackageResponse("Room is full", False))
+                    self.sendall(packageserver.createPackageResponse("Room is full", False))
                     continue
 
                 list_room[data['room']]['listPlayer'].append(self.client)
-                #("Connected to room : ", list_room[data['room']])
-                self.send(packageserver.createPackageResponse("Connected to room " + str(data['room']),True))
+                print ("Connected to room : ", list_room[data['room']])
+                self.sendall(packageserver.createPackageResponse("Connected to room " + str(data['room']),True))
 
             elif data['code']==100:
                 #print ("Starting room .... ",data['room'])
@@ -115,8 +119,8 @@ class Client(threading.Thread):
 
                 list_room[data['room']]['location'][str(player_name)]['alive']=True
                 data=packageserver.createPackageInitGame(data['room'],player_name,x,y)
-                #print (data)
-                self.send(data)
+                print (data)
+                self.sendall(data)
 
             elif data['code']==200:
                 list_room[data['room']]['location'][data['playerName']]['x']=data['x']
@@ -131,7 +135,8 @@ class Client(threading.Thread):
                                                      list_room[data['room']]['location']['player2']['x'],
                                                      list_room[data['room']]['location']['player2']['y'])
 
-                self.send(data)
+                print (data)
+                self.sendall(data)
 
 server=BombermanServer()
 server.run()
