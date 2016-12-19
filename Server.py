@@ -10,7 +10,7 @@ list_room = defaultdict(dict)
 
 class BombermanServer:
     def __init__(self):
-        self.host = 'localhost'
+        self.host = '0.0.0.0'
         self.port = 5000
         self.backlog = 5
         self.size = 1024

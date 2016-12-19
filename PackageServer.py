@@ -1,4 +1,4 @@
-import pickle
+import json
 import State
 
 class PackageServer():
@@ -38,7 +38,7 @@ class PackageServer():
         return self.data
 
     def deSerialization(self, data):
-        return pickle.loads(data)
+        return json.loads(data)
 
     def serialization(self, data):
-        return pickle.dumps(data)
+        return json.dumps(data)
