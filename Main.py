@@ -18,7 +18,7 @@ while(1):
         room=input()
         response=bomberman.initRoom(room)
         response = packageclient.deSerialization(response)
-        print response
+        #print response
         if (response['code'] == 0):
             print(response['message'])
 
