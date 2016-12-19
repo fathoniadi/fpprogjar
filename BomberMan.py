@@ -42,7 +42,7 @@ class Client(threading.Thread):
         self.client.connect((self.host,self.port))
 
     def receiveOnce(self):
-        msg=self.client.recv(1024)
+        msg=self.client.recv()
         return (msg.decode())
 
     def run(self):
@@ -51,7 +51,7 @@ class Client(threading.Thread):
         while running:
             inputready, outputready, exceptready = select.select(input, [], [])
             for s in inputready:
-                msg=self.client.recv(1024)
+                msg=self.client.recv()
                 msg=msg.decode()
                 packetclient = PackageClient.PackageClient()
                 data=packetclient.deSerialization(msg)
