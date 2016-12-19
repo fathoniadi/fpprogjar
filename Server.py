@@ -56,7 +56,7 @@ class Client(threading.Thread):
         serverpackage=PackageServer.PackageServer()
         data=serverpackage.serialization(data)
         self.client.sendall(data.encode('utf-8'))
-
+        #hehe
     def run(self):
         running = 1
         while running:
