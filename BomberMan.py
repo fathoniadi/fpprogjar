@@ -141,6 +141,8 @@ class BomberMan():
         if (data['code']==201):
             print ("BOMMMM",data)
             bomb = Bomb.Bomb(self)
+            self.peta_game[data['x']][data['y']] = '!'
+            self.screen.blit(self.bomb, [data['y'] * 50, data['x'] * 50])
             bomb.taruh(data['x'], data['y'])
             bomb.start()
 
