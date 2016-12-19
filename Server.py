@@ -129,6 +129,13 @@ class Client(threading.Thread):
                             print (data)
                             self.sendall(data)
 
+                        elif data['code'] == 201:
+                            for player in list_room[data['room']]['listPlayer']:
+                                if player==self.client:
+                                    continue
+                                dataBomb=packageserver.createPackageNewBomb(data['x'],data['y'])
+                                player.send(packageserver.serialization(dataBomb).encode('utf-8'))
+
                         elif data['code']==200:
                             list_room[data['room']]['location'][data['playerName']]['x']=data['x']
                             list_room[data['room']]['location'][data['playerName']]['y'] = data['y']

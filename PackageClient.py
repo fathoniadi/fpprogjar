@@ -26,6 +26,10 @@ class PackageClient():
         self.data = {'code': 300, 'playerName': _playerName}
         return self.data
 
+    def createPackageBomb(self,_x,_y,_room):
+        self.data = {'code':201, 'room':_room,'x':_x,'y':_y}
+        return self.data
+
     def deSerialization(self, data):
         return json.loads(data)
 

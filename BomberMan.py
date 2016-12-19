@@ -124,20 +124,25 @@ class BomberMan():
         exit()
 
     def broadcastReceive(self,data):
-        print (data)
-        if (self.player.file_player=="player1"):
-            enemy_x=data['player2X']
-            enemy_y = data['player2Y']
-            self.player2.x=enemy_x
-            self.player2.y=enemy_y
-            self.player2.file_player="player2"
+        if (data['code']==200):
+            if (self.player.file_player=="player1"):
+                enemy_x=data['player2X']
+                enemy_y = data['player2Y']
+                self.player2.x=enemy_x
+                self.player2.y=enemy_y
+                self.player2.file_player="player2"
 
-        if (self.player.file_player=="player2"):
-            enemy_x=data['player1X']
-            enemy_y = data['player1Y']
-            self.player2.x=enemy_x
-            self.player2.y=enemy_y
-            self.player2.file_player = "player1"
+            if (self.player.file_player=="player2"):
+                enemy_x=data['player1X']
+                enemy_y = data['player1Y']
+                self.player2.x=enemy_x
+                self.player2.y=enemy_y
+                self.player2.file_player = "player1"
+        if (data['code']==201):
+            print ("BOMMMM",data)
+            bomb = Bomb.Bomb(self)
+            bomb.taruh(data['x'], data['y'])
+            bomb.start()
 
     def update(self):
         self.initSprite()
@@ -159,7 +164,10 @@ class BomberMan():
 
             if (self.space):
                 self.peta_game[self.player.x][self.player.y]='!'
+                bombData=self.packageclient.createPackageBomb(self.player.x,self.player.y,self.room)
+                self.client.sendall(bombData)
                 bomb=Bomb.Bomb(self)
+                bomb.taruh(self.player.x,self.player.y)
                 bomb.start()
 
             if (self.up):

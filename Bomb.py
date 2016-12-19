@@ -8,7 +8,6 @@ class Bomb(threading.Thread):
         self.timer = 10
         self.clock = pygame.time.Clock()
         self.game=bomberman
-        self.taruh(self.game.player.x,self.game.player.y)
         self.running=1
         threading.Thread.__init__(self)
 
