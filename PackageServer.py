@@ -25,7 +25,7 @@ class PackageServer():
                      'player2X': _player2X, 'player2Y': _player2Y}
         return self.data
 
-    def createPackageNewBomb(self, _x, _y, _playerName, _room):
+    def createPackageNewBomb(self, _x, _y):
         self.data = {'code': 201, 'x': _x, 'y': _y}
         return self.data
 
