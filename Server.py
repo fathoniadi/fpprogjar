@@ -154,7 +154,9 @@ class Client(threading.Thread):
 
                             print (data)
                             self.sendall(data)
-
+                        elif data['code']==300:
+                            list_room[data['room']]['location'][data['playerName']]['alive']=False
+                            print(data)					
                     except:
                         pass
 

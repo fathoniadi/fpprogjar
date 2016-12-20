@@ -122,7 +122,8 @@ class BomberMan():
         pygame.display.flip()
         for i in range(10):
             self.clock.tick(10)
-
+        data = self.packageclient.createPackagePlayerDead(self.player.file_player,self.room)
+        self.client.sendall(data)
         exit()
 
     def broadcastReceive(self,data):

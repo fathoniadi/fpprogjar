@@ -27,8 +27,8 @@ class PackageClient():
         return self.data
 
     #apabila player terkena bomb
-    def createPackagePlayerDead(self, _playerName):
-        self.data = {'code': 300, 'playerName': _playerName}
+    def createPackagePlayerDead(self, _playerName,_room):
+        self.data = {'code': 300, 'playerName': _playerName, 'room' :_room}
         return self.data
 
     #membuat bomob pada lokasi (x,y)
