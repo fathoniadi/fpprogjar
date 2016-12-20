@@ -156,7 +156,12 @@ class Client(threading.Thread):
                             self.sendall(data)
                         elif data['code']==300:
                             list_room[data['room']]['location'][data['playerName']]['alive']=False
-                            print(data)					
+                            for player in list_room[data['room']]['listPlayer']:
+                                if player==self.client:
+                                    continue
+                                data=packageserver.createPackagePlayerDead(data['playerName'])
+                                player.send(packageserver.serialization(data).encode('utf-8'))
+
                     except:
                         pass
 
