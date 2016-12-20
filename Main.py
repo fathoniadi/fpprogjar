@@ -6,7 +6,8 @@ print ("BOMBERMAN GAME MULTIPLAYER")
 print ("==========================")
 print ("1 Create Game")
 print ("2 Connect Game")
-
+print ("3 Start Game")
+print ("Menu > ")
 packageclient=PackageClient.PackageClient()
 bomberman=BomberMan.BomberMan()
 connected=False
@@ -14,6 +15,7 @@ connected=False
 while(1):
     inp=input()
     if (int(inp)==1):
+        print ("Silahkan masukkan id room (angka bebas)")
         print ("Room id : ")
         room=input()
         response=bomberman.initRoom(room)
@@ -24,6 +26,7 @@ while(1):
 
 
     if (int(inp)==2):
+        print ("Silahkan masukkan id room")
         print ("Room id : ")
         room=input()
         response=bomberman.connectRoom(room)
