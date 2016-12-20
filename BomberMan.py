@@ -8,6 +8,7 @@ import threading
 import select
 import PackageServer
 import PackageClient
+import random
 
 class Client(threading.Thread):
     def __init__(self,game):
@@ -161,9 +162,13 @@ class BomberMan():
             self.isWin=True
             self.STATE=State.State.GAME_OVER
 
+
+    #def randommap(self):
+
     def update(self):
         self.initSprite()
         self.gm = GameMap.GameMap()
+        #self.randommap = 
         self.peta_game = self.gm.createMap("./assets/peta/map.txt")
         self.client.start()
 
