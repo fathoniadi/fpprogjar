@@ -82,6 +82,8 @@ class BomberMan():
         self.bomb = pygame.transform.scale(pygame.image.load("./assets/bomb.png"), (50, 50))
         self.explosion = pygame.transform.scale(pygame.image.load("./assets/explosion.png"), (50, 50))
         self.gameover = pygame.transform.scale(pygame.image.load("./assets/gameover.png"), (800, 600))
+        
+        self.win = pygame.transform.scale(pygame.image.load("./assets/Youwin.png"), (800, 600))
 
     def changeState(self,state):
         self.STATE=state

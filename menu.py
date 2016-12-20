@@ -17,7 +17,7 @@ class Menu():
         self.initSprite()
 
     def initSprite(self):
-        self.menu = pygame.transform.scale(pygame.image.load("./assets/Background_baru.png"), (800, 600))
+        self.menu = pygame.transform.scale(pygame.image.load("./assets/NEW.png"), (800, 600))
         self.screen.blit(self.menu,(0,0))
 
     def update(self): 
