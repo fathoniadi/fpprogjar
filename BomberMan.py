@@ -64,6 +64,7 @@ class BomberMan():
         self.player2.x = 0
         self.player2.y = 0
 
+        self.isWin=False
         self.STATE=State.State.RUNNING
         self.list_bomb = []
         self.screen = pygame.display.set_mode((width, height))
@@ -118,11 +119,20 @@ class BomberMan():
         return (response)
 
     def gameOver(self):
+        data = self.packageclient.createPackagePlayerDead(self.player.file_player, self.room)
+        self.client.sendall(data)
+        print (data)
         self.screen.blit(self.gameover, [0, 0])
         pygame.display.flip()
         for i in range(10):
             self.clock.tick(10)
+        exit()
 
+    def gameWin(self):
+        self.screen.blit(self.win, [0, 0])
+        pygame.display.flip()
+        for i in range(10):
+            self.clock.tick(10)
         exit()
 
     def broadcastReceive(self,data):
@@ -147,6 +157,9 @@ class BomberMan():
             self.screen.blit(self.bomb, [data['y'] * 50, data['x'] * 50])
             bomb.taruh(data['x'], data['y'])
             bomb.start()
+        if (data['code']==300):
+            self.isWin=True
+            self.STATE=State.State.GAME_OVER
 
     def update(self):
         self.initSprite()
@@ -220,4 +233,7 @@ class BomberMan():
 
             pygame.display.flip()
 
-        self.gameOver()
+        if (self.isWin==False):
+            self.gameOver()
+        else :
+            self.gameWin()
