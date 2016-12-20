@@ -1,8 +1,17 @@
 Welcome to Bomberman!
 ===================
 
+-------------
+Deskripsi : 
+-------------
+*Bomberman* merupakan game multiplayer yang berbasis socket yang dapat dimainkan maksimal 
+min : 1 user
+max : 2 user
 
-*Bomberman* merupakan game multiplayer yang berbasis socket yang dapat dimainkan maksimal 4 user. *Bomberman* dibuat menggunakan bahasa pemrograman **Python** serta menggunakan library **pygame**.
+permainan ini dapat dimainkan di beberapa room
+ 
+bahasa pemrograman : **Python** 
+library			   : **pygame**
 
 ----------
 
@@ -21,6 +30,13 @@ Penggunaan
 ##### 4. Kedua player pilih connect ke room yang telah dibuat
 ##### 5. Pilih menu 3 untuk start game
 
+
+> - **note**
+	- Game secara default akan connect ke server 'localhost'. apabila ingin bermain dengan server lain, maka harus mengubah host di bomberman.py, mencocokkan dengan ip server.
+	- Server secara default akan listen ke port 5000 dan ip localhost.
+	untuk membuka koneksi silahkan ganti localhost ke 0.0.0.0
+		
+referensi assets :
 Source Sprite
 -------------
 1. Sprite Bomb : http://static.giantbomb.com/uploads/original/0/231/186135-bomb.png
